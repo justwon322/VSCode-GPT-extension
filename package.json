@@ -1,0 +1,28 @@
+{
+  "name": "vscode-gpt-extension",
+  "displayName": "GPT Coding Assistant",
+  "description": "VS Code extension with OpenAI streaming and workspace context",
+  "version": "0.0.1",
+  "publisher": "example",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onCommand:gptExtension.ask",
+    "onCommand:gptExtension.toggleMode"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "compile": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/node-fetch": "^2.6.12",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
