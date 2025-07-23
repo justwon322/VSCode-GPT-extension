@@ -1,0 +1,38 @@
+{
+  "name": "vscode-gpt-extension",
+  "version": "1.0.0",
+  "description": "initial update",
+  "main": "./dist/extension.js",
+  "scripts": {
+    "compile": "tsc",
+    "watch": "tsc -w",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/node-fetch": "^2.6.12",
+    "@types/vscode": "^1.102.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-gpt-extension.chat",
+        "title": "Chat with LLM"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onCommand:vscode-gpt-extension.chat"
+  ],
+  "engines": {
+    "vscode": "^1.80.0"
+  }
+}
