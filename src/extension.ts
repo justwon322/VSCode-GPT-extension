@@ -3,10 +3,22 @@ import fetch from 'node-fetch';
 import { Readable } from 'stream';
 import * as fs from 'fs';
 import * as path from 'path';
+import Database, { Database as SQLiteDatabase } from 'better-sqlite3';
 
 let mode: 'coding' | 'question' = 'question';
+let db: SQLiteDatabase;
 
 export function activate(context: vscode.ExtensionContext) {
+    const dbDir = context.globalStorageUri.fsPath;
+    fs.mkdirSync(dbDir, { recursive: true });
+    const dbPath = path.join(dbDir, 'history.db');
+    db = new Database(dbPath);
+    db.exec(`CREATE TABLE IF NOT EXISTS conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp INTEGER,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL
+    )`);
     context.subscriptions.push(
         vscode.commands.registerCommand('gptExtension.toggleMode', () => {
             mode = mode === 'coding' ? 'question' : 'coding';
@@ -31,13 +43,16 @@ export function activate(context: vscode.ExtensionContext) {
                     contextText += `FILE: ${file}\n` + fs.readFileSync(file, 'utf8') + '\n';
                 }
             }
+            const history = db.prepare('SELECT role, content FROM conversations ORDER BY id DESC LIMIT 100').all().reverse();
+            const messages = [
+                { role: 'system', content: 'You are a coding assistant.' },
+                ...history,
+                { role: 'user', content: prompt + '\n' + contextText }
+            ];
             const body = {
                 model: 'gpt-3.5-turbo',
                 stream: true,
-                messages: [
-                    { role: 'system', content: 'You are a coding assistant.' },
-                    { role: 'user', content: prompt + '\n' + contextText }
-                ]
+                messages
             };
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
@@ -68,6 +83,11 @@ export function activate(context: vscode.ExtensionContext) {
                 }
             });
             await new Promise(resolve => reader.on('end', resolve));
+            const insert = db.prepare('INSERT INTO conversations (timestamp, role, content) VALUES (?, ?, ?)');
+            const now = Date.now();
+            insert.run(now, 'user', prompt);
+            insert.run(now, 'assistant', output);
+            db.prepare('DELETE FROM conversations WHERE id NOT IN (SELECT id FROM conversations ORDER BY id DESC LIMIT 100)').run();
             vscode.window.showInformationMessage('Response received');
         })
     );
