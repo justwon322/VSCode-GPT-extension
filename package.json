@@ -1,7 +1,7 @@
 {
   "name": "vscode-gpt-extension",
   "version": "1.0.0",
-  "description": "initial update",
+  "description": "VS Code chat extension using Python and OpenAI streaming",
   "main": "./dist/extension.js",
   "scripts": {
     "compile": "tsc",
@@ -14,12 +14,10 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "@types/node-fetch": "^2.6.12",
     "@types/vscode": "^1.102.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "node-fetch": "^2.7.0"
   },
   "contributes": {
     "commands": [
